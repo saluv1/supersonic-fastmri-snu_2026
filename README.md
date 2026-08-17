@@ -366,7 +366,7 @@ FastMRI_challenge/
         ├── promptmr_plus.py
         ├── reentrant_wrapper.py
         └── fastmri/
-
+```
 # 절대경로 수정 적용 순서
 
 로컬(`~/Downloads/FastMRI_challenge`)에서 진행합니다.
@@ -428,7 +428,7 @@ git commit -m "Remove hardcoded absolute paths; accept DATA_ROOT as argument"
 git push
 ```
 ```
-
+```
 ## 14. References
 
 1. Xin, B., Ye, M., Axel, L., and Metaxas, D. N. *Rethinking Deep Unrolled Model for Accelerated MRI Reconstruction*. ECCV 2024.
