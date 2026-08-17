@@ -24,5 +24,4 @@ SSIM_full (acc4): 0.9496   SSIM_full (acc8): 0.9145
 SSIM_bbox (acc4): 0.9504   SSIM_bbox (acc8): 0.9098
 Recon Time (acc4): 410.57s (360.2 ms/slice)   (acc8): 384.10s (358.0 ms/slice)
 Recon Time (total): 794.68s
-root@workspace-o2dovay3me6j-0:~/FastMRI_challenge# 
-여기에 직접 gpu 기반으로 돌린 log가 있어
+
