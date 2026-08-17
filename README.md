@@ -366,6 +366,67 @@ FastMRI_challenge/
         ├── promptmr_plus.py
         ├── reentrant_wrapper.py
         └── fastmri/
+
+# 절대경로 수정 적용 순서
+
+로컬(`~/Downloads/FastMRI_challenge`)에서 진행합니다.
+
+## 1. 셸 스크립트 3개 교체
+
+- `train.sh`      ← 이 폴더의 train.sh
+- `recon_eval.sh` ← 이 폴더의 recon_eval.sh
+- `reconstruct.sh`← 이 폴더의 reconstruct.sh
+
+```bash
+chmod +x train.sh recon_eval.sh reconstruct.sh
+rm -f leaderboard_eval.sh          # 죽은 경로(test_Varnet) 참조, 미사용
+```
+
+## 2. 파이썬 기본값 4곳 (에디터로 직접)
+
+| 파일 | 행 | 수정 |
+|---|---|---|
+| `train.py` | 80 | `default="/root/Data/train/"` → `default="../Data/train/"` |
+| `train.py` | 87 | `default="/root/Data/val/"`   → `default="../Data/val/"`   |
+| `smoke_test_bbox_train.py` | 56 | `Path("/root/Data/train/")` → `Path("../Data/train/")` |
+| `smoke_test_metric_aligned_train.py` | 48 | `Path("/root/Data/train/")` → `Path("../Data/train/")` |
+
+sed 로 일괄 처리해도 됩니다:
+
+```bash
+sed -i 's|"/root/Data/train/"|"../Data/train/"|; s|"/root/Data/val/"|"../Data/val/"|' \
+  train.py smoke_test_bbox_train.py smoke_test_metric_aligned_train.py
+```
+
+## 3. 확인
+
+```bash
+grep -rn --include="*.py" --include="*.sh" "/root/" . | grep -v "^./backups/"
+# → 아무것도 안 나와야 정상
+```
+
+`backups/` 는 참고용 스냅샷이므로 수정하지 않습니다.
+
+## 4. README 4절 교체
+
+기존 "## 4. 경로 설정" 절 전체를 `README_section4.md` 내용으로 교체.
+
+## 5. 서버에서 검증 (4 epoch 학습 종료 후)
+
+```bash
+cd /root/FastMRI_challenge && bash recon_eval.sh
+cd /tmp && bash /root/FastMRI_challenge/recon_eval.sh   # 이게 핵심
+```
+
+두 결과 모두 SSIM_full 0.9320 / SSIM_bbox 0.9301 이 나와야 합니다.
+
+## 6. 커밋
+
+```bash
+git add -A
+git commit -m "Remove hardcoded absolute paths; accept DATA_ROOT as argument"
+git push
+```
 ```
 
 ## 14. References
