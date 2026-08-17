@@ -14,7 +14,7 @@ __homepage__ = "https://fastmri.org/"
 import torch
 from packaging import version
 
-from .coil_combine import rss, rss_complex
+from .coil_combine import rss, rss_complex, sens_expand, sens_reduce
 from .fftc import fftshift, ifftshift, roll
 from .losses import SSIMLoss
 from .math import (

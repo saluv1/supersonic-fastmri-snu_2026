@@ -94,10 +94,8 @@ def center_crop(data, height, width):
     Returns:
     - cropped tensor on the available device
     """
-    device = torch.device('cuda') if torch.cuda.is_available() else 'cpu'
     if isinstance(data, np.ndarray):
         data = torch.from_numpy(data)
-    data = data.to(device)
 
     _, h, w = data.shape
 
