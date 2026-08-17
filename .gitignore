@@ -1,3 +1,37 @@
-venv
-env
-__pycache__
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+venv/
+env/
+.venv/
+
+# OS junk
+.DS_Store
+__MACOSX/
+
+# 대회 데이터 (커밋 금지)
+Data/
+*.h5
+smoke_data/
+smoke_eval/
+val_eval/
+
+# 학습 산출물
+result/
+reconstructions*/
+*.pt
+*.pth
+*.ckpt
+*.tar.gz
+*.zip
+
+# 데모 / 백업 잔재
+tutorial.ipynb
+*.bak
+*.before_*
+untitled.py
+
+# 로그 (증빙용 로그만 예외)
+*.log
+!experiments/logs/*.log
