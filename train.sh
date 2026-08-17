@@ -1,17 +1,21 @@
-cd /root/FastMRI_challenge
-
-mkdir -p \
-  /root/result/promptmr8_metric_aligned_50ep_v1
-
+set -euo pipefail
+cd "$(dirname "$0")"
+ 
+DATA_ROOT="${1:-../Data}"
+NET_NAME="${2:-promptmr8_metric_aligned_50ep_v1}"
+RESULT_DIR="../result/$NET_NAME"
+ 
+mkdir -p "$RESULT_DIR"
+ 
 python3 -u train.py \
   -g 0 \
-  -n promptmr8_metric_aligned_50ep_v1 \
+  -n "$NET_NAME" \
   -e 50 \
   -b 1 \
   -r 100 \
   -l 2e-4 \
-  -t /root/Data/train/ \
-  -v /root/Data/val/ \
+  -t "$DATA_ROOT/train/" \
+  -v "$DATA_ROOT/val/" \
   --seed 430 \
   --num-cascades 8 \
   --n-history 3 \
@@ -49,5 +53,4 @@ python3 -u train.py \
   --aug_max_shearing_y 10.0 \
   --aug_max_scaling 0.05 \
   --annealing-epoch 1 \
-  2>&1 | tee \
-  /root/result/promptmr8_metric_aligned_50ep_v1/train_stdout.log
+  2>&1 | tee "$RESULT_DIR/train_stdout.log"
