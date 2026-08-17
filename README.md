@@ -1,137 +1,376 @@
-# 2026 baby varnet (annotation)
-2026 SNU FastMRI challenge — knee annotation track
+# 2026 SNU FastMRI Challenge - Team Supersonic
 
-* 본 baseline은 **E2E-VarNet** 구조입니다. (baby unet 대비 kspace + sensitivity map을 직접 다룹니다.)
-* 본 대회는 **knee 데이터만** 사용합니다.
-* 복원 품질은 두 가지 SSIM으로 평가합니다.
-  * **SSIM_full**: foreground mask 내부 영역에 대해 평균한 SSIM
-  * **SSIM_bbox**: fastMRI+ 병변 bounding-box 영역 안에서만 계산한 SSIM
+2026 SNU FastMRI Challenge knee annotation track 최종 제출 코드입니다.
 
-## 1. 폴더 계층
+* 모델은 PromptMR+를 기반으로 하며, 8 GB GPU에서 학습할 수 있도록 크기를 줄였습니다.
+* 제공된 train/validation 데이터만 사용하였고, 외부 데이터나 사전학습 가중치는 사용하지 않았습니다.
+* 최종 채점에는 `recon_eval.sh`만 사용합니다.
+* 공식 파일인 `recon_eval.py`와 `utils/common/metrics.py`는 수정하지 않았습니다.
 
-### 폴더의 전체 구조
-![image](docs/fastmri_folder_structure.png)
-* `FastMRI_challenge`, `Data`, `result` 폴더가 위의 구조대로 설정되어 있어야 default argument를 활용할 수 있습니다.
-* 본 github repository는 `FastMRI_challenge` 폴더입니다.
-* `Data` 폴더는 MRI data 파일을 담고 있으며 아래에 상세 구조를 첨부하겠습니다.
-* `result` 폴더는 학습한 모델의 weights을 기록하고 validation, leaderboard dataset의 reconstruction image를 저장하는데 활용되며, 아래에 상세 구조를 첨부하겠습니다.
+## 1. 최종 제출 모델
 
-### Data 폴더의 구조
-![image](docs/fastmri_data_structure.png)
-* train, val:
-    * train, val 폴더는 각각 모델을 학습(train), 검증(validation)하는데 사용하며 각각 image, kspace 폴더로 나뉩니다.
-    * 참가자들은 generalization과 representation의 trade-off를 고려하여 train, validation의 set을 자유로이 나눌 수 있습니다.
-    * image와 kspace 폴더에 들어있는 파일의 형식은 다음과 같습니다: knee\_{mask 형식}\_{순번}.h5
-    * ex) knee_acc4_10.h5, knee_acc8_3.h5
-    * {mask 형식}은 "acc4", "acc8" 중 하나입니다.
-    * train은 "acc4", "acc8" 각각 {순번} 1 ~ 85, val은 각각 1 ~ 15 입니다.
-* leaderboard:
-   * **leaderboard는 성능 평가를 위해 활용하는 dataset이므로 절대로 학습 과정에 활용하면 안됩니다.** (제출 코드는 seed 고정 재학습으로 재현 검증합니다.)
-   * leaderboard 폴더는 mask 형식에 따라서 acc4과 acc8 폴더로 나뉩니다.
-   * acc4과 acc8 폴더는 각각 image, kspace 폴더로 나뉩니다.
-   * image와 kspace 폴더에 들어있는 파일의 형식은 다음과 같습니다: knee\_test{순번}.h5
-   * {순번}은 acc4 / acc8 각각 1 ~ 29 사이의 숫자입니다.
+| 항목 | 값 |
+|---|---|
+| 모델 | PromptMR+, 8 cascades |
+| 파라미터 수 | 6.01M |
+| 학습 epoch | 50 |
+| best checkpoint epoch | 39 |
+| best validation objective | 0.1075935853 |
+| 체크포인트 | `../result/promptmr8_metric_aligned_50ep_v1/checkpoints/best_model.pt` |
+| SHA-256 | `47530c3c029fb25674a9a582795fd05ffd272265f30c62c89b5471ec2a485e8c` |
 
-### Annotation
-* fastMRI+ knee 병변 bounding box는 각 image h5의 `attrs['annotations']`에 JSON으로 저장되어 있습니다.
-* 형식: `{ "<slice>": [ {"x", "y", "width", "height", "label"}, ... ] }` (384 x 384 image 공간 기준, width·height가 16 초과인 박스만 포함)
+VESSL 서버에서 측정한 공개 리더보드 결과는 다음과 같습니다.
 
-### result 폴더의 구조
-* result 폴더는 모델의 이름에 따라서 여러 폴더로 나뉠 수 있습니다.
-* test_Unet (혹은 test_Varnet) 폴더는 아래 3개의 폴더로 구성되어 있습니다.
-  * checkpoints - `model.pt`, `best_model.pt`의 정보가 있습니다. 모델의 weights 정보를 담고 있습니다.
-  * reconstructions_val - validation dataset의 reconstruction을 저장합니다. knee\_{mask 형식}\_{순번}.h5 형식입니다. (```train.py``` 참고)
-  * reconstructions_leaderboard - leaderboard dataset의 reconstruction을 acc별로 저장합니다. knee\_test{순번}.h5 형식입니다. (```reconstruct.py``` 참고)
-  * val_loss_log.npy - epoch별로 validation loss를 기록합니다. (```train.py``` 참고)
+```text
+Leaderboard SSIM_full  : 0.9320
+Leaderboard SSIM_bbox  : 0.9301
+Leaderboard Recon Time : 794.68s (359.1 ms/slice)
 
-## 2. 폴더 정보
-
-```bash
-├── .gitignore
-├── leaderboard_eval.py
-├── README.md
-├── recon_eval.py
-├── reconstruct.py
-├── requirements.txt
-├── train.py
-├── tutorial.ipynb
-└── utils
-│   ├── common
-│   │   ├── loss_function.py
-│   │   ├── metrics.py
-│   │   └── utils.py
-│   ├── data
-│   │   ├── load_data.py
-│   │   └── transforms.py
-│   ├── learning
-│   │   ├── test_part.py
-│   │   └── train_part.py
-│   └── model
-│       ├── fastmri/     # vendored fastMRI 연산 (fft, complex 연산, coil combine 등)
-│       ├── unet.py      # VarNet 내부 regularizer로 쓰이는 U-Net
-│       └── varnet.py    # E2E-VarNet 모델 (SensitivityModel + cascade)
-└── result
+SSIM_full (acc4): 0.9496   SSIM_full (acc8): 0.9145
+SSIM_bbox (acc4): 0.9504   SSIM_bbox (acc8): 0.9098
+Recon Time (acc4): 410.57s (360.2 ms/slice)
+Recon Time (acc8): 384.10s (358.0 ms/slice)
 ```
 
-## 3. Before you start
-* ```train.py``` 실행 후 ```recon_eval.py``` 하나로 reconstruction과 평가를 한 번에 진행하면 됩니다.
-* ```train.py```
-   * train/validation을 진행하고 학습한 model의 결과를 result 폴더에 저장합니다.
-   * 가장 성능이 좋은 모델의 weights을 ```best_model.pt```으로 저장합니다.
-* ```recon_eval.py```
-   * ```train.py```으로 학습한 ```best_model.pt```으로 leaderboard dataset을 reconstruction하면서 동시에 SSIM을 측정합니다.
-   * reconstruction 결과는 result 폴더에 저장됩니다.
-   * SSIM_full, SSIM_bbox 각각에 대해 acc4 / acc8 값과 평균을 출력합니다.
-   * acc4 / acc8 각각의 reconstruction 시간도 함께 출력됩니다. 이 추론 시간도 채점 기준에 포함되며, SSIM과 합산한 종합 점수 산정 방식은 추후 공지합니다.
-   * 같은 지표(```utils/common/metrics.py```)로 본인 validation reconstruction을 자가채점할 수 있습니다. (annotation은 각 image h5의 ```attrs['annotations']```에 포함)
-* ```recon_eval.py```와 ```utils/common/metrics.py```는 운영자가 그대로 다시 실행하는 **채점/시간측정 harness**이므로 수정하지 않는 것을 전제로 합니다. 모델 정의와 reconstruction 방식은 ```utils/model/```과 ```utils/learning/test_part.py```에서 자유롭게 수정하면 됩니다.
-* reconstruction과 평가를 나눠서 실행하고 싶다면 ```reconstruct.py``` → ```leaderboard_eval.py``` 순서도 그대로 사용할 수 있습니다. (참고용)
+원본 출력은 `experiments/recon_eval_gpu.log`에 저장되어 있습니다.
 
-## 4. How to set?
-(python 3.12.9)
+## 2. 폴더 구조
+
+본 저장소와 데이터, 결과 폴더는 다음과 같이 형제 관계로 배치합니다.
+
+```text
+<root>/
+├── FastMRI_challenge/                # 본 저장소
+├── Data/
+│   ├── train/
+│   │   ├── image/
+│   │   └── kspace/
+│   ├── val/
+│   │   ├── image/
+│   │   └── kspace/
+│   └── leaderboard/
+│       ├── acc4/
+│       │   ├── image/
+│       │   └── kspace/
+│       └── acc8/
+│           ├── image/
+│           └── kspace/
+└── result/
+    └── promptmr8_metric_aligned_50ep_v1/
+        └── checkpoints/
+            └── best_model.pt
+```
+
+`image`와 `kspace` 폴더에는 같은 이름의 H5 파일이 있어야 합니다.
+
+fastMRI+ annotation은 image H5의 `attrs['annotations']`에 JSON 형식으로 저장되어 있습니다. 좌표는 384 x 384 target image를 기준으로 합니다.
+
+## 3. 환경 설정
+
+학습에 사용한 환경은 다음과 같습니다.
+
+```text
+Python 3.10.12
+PyTorch 2.3.1+cu121
+torchvision 0.18.1+cu121
+NumPy 1.24.4
+CUDA runtime 12.1
+NVIDIA GeForce GTX 1080 8 GB
+```
+
+패키지는 아래 명령어로 설치합니다.
+
 ```bash
 pip3 install -r requirements.txt
 ```
 
-## 5. How to train?
-```bash
-python train.py // sh train.sh
-```
-- validation할 때, reconstruction data를 ```result/reconstructions_val/```에 저장합니다.
-- epoch 별로 validation dataset에 대한 loss를 기록합니다.
-- sh train.sh를 사용하여도 같은 결과를 얻으실 수 있습니다. Hyperparameter를 쉽게 조작할 수 있습니다.
-- 주요 hyperparameter (```train.sh```에서 조절):
-  - ```--cascade``` : cascade 개수 (기본 1, 원논문 12). 클수록 성능↑·메모리/시간↑
-  - ```--chans``` : cascade U-Net 채널 수 (기본 9, 원논문 18)
-  - ```--sens_chans``` : sensitivity map U-Net 채널 수 (기본 4, 원논문 8)
-- VarNet은 메모리 사용량이 크므로 batch size는 1을 기본으로 합니다.
-- **seed 고정**을 하여 이후에 Re-training하였을 때 **같은 결과가 나와야 합니다**.
+체크포인트는 NumPy 1.24.4 환경에서 저장했습니다. NumPy major version이 달라지면 체크포인트를 불러오지 못할 수 있으므로 NumPy 1.x 환경을 사용해야 합니다.
 
-## 6. How to reconstruct & evaluate?
-```bash
-python recon_eval.py        # 또는
-sh recon_eval.sh            # -n 'test_Varnet' -p '/root/Data/leaderboard'
-```
-- leaderboard dataset을 reconstruction하면서 동시에 SSIM_full, SSIM_bbox를 측정합니다.
-- reconstruction data는 ```result/reconstructions_leaderboard```에 acc별로 저장됩니다.
-- 4X / 8X sampling mask에 대한 SSIM_full, SSIM_bbox의 평균과 전체 reconstruction 시간(및 slice당 평균 시간)을 함께 출력합니다.
-- reconstruction 시간은 slice 한 장을 복원하는 model forward(```test_part.py```의 ```recon_slice```)만 batch=1로 측정하며, h5 입출력과 warmup slice는 제외하고 slice별 **평균**으로 집계합니다.
-- 하나의 볼륨(.h5)의 forward 시간이 60초를 초과하면 결과 하단에 ```[WARNING]``` 메시지가 출력됩니다. 추론이 지나치게 느리다는 뜻이므로 최적화가 필요합니다.
-- reconstruction과 평가를 나눠 실행하려면 ```reconstruct.py``` → ```leaderboard_eval.py```를 사용해도 됩니다. (참고용)
+전체 패키지 목록은 `experiments/evidence/pip_freeze.txt`에 있습니다.
 
-### 실행 결과 예시 & 리더보드 기입
-```recon_eval.py``` (또는 ```recon_eval.sh```)를 실행하면 상단에 아래와 같은 요약이 출력됩니다.
+## 4. 경로 설정
+
+현재 `train.sh`와 `recon_eval.sh`에는 학습에 사용한 VESSL 서버 경로가 들어 있습니다. 다른 위치에서 실행하는 경우 아래 경로를 실제 데이터 위치에 맞게 수정해야 합니다.
+
+`train.sh`:
+
+```bash
+cd /root/FastMRI_challenge
+-t /root/Data/train/
+-v /root/Data/val/
+```
+
+`recon_eval.sh`:
+
+```bash
+-p /root/Data/leaderboard
+```
+
+`recon_eval.py`에서 사용하는 `../result`는 공식 코드의 상대경로입니다. 최종 체크포인트는 다음 위치에 두어야 합니다.
+
 ```text
-Leaderboard SSIM_full : 0.8469
-Leaderboard SSIM_bbox : 0.8354
-Leaderboard Recon Time : 193.96s (87.6 ms/slice)
+../result/promptmr8_metric_aligned_50ep_v1/checkpoints/best_model.pt
 ```
-- 위 출력의 세 값 — **SSIM_full (`0.8469`), SSIM_bbox (`0.8354`), slice당 시간 (`87.6` ms/slice)** — 을 리더보드 웹에 그대로 기입하면 됩니다.
-- ```Recon Time```은 전체 시간(```193.96s```)과 slice당 평균(```87.6 ms/slice```)이 함께 표시되며, 리더보드에는 **slice당 시간(ms/slice)** 을 기입합니다.
-- ```= Details =``` 이하 acc4 / acc8 세부 값은 참고용이며 기입 대상이 아닙니다.
 
-## 7. What to submit!
-- github repository(코드 실행 방법 readme에 상세 기록)
-- loss 그래프 혹은 기록
-- 모델 weight file
-- 모델 설명 ppt
+## 5. 학습
+
+학습은 `train.sh` 하나로 실행합니다.
+
+```bash
+cd FastMRI_challenge
+bash train.sh
+```
+
+최종 학습 설정은 다음과 같습니다.
+
+| 항목 | 값 |
+|---|---|
+| Epochs | 50 |
+| Batch size | 1 |
+| Optimizer | AdamW, weight decay 0.01 |
+| Initial learning rate | 2e-4 |
+| LR scheduler | MultiStepLR |
+| LR milestones | 16, 27 |
+| LR gamma | 0.3 |
+| Seed | 430 |
+| Iterations per epoch | 4651 |
+
+학습 시간은 epoch당 약 3시간이며 전체 학습에는 약 150시간이 소요되었습니다.
+
+학습 결과는 다음 폴더에 저장됩니다.
+
+```text
+../result/promptmr8_metric_aligned_50ep_v1/
+├── checkpoints/
+│   ├── model.pt
+│   └── best_model.pt
+├── reconstructions_val/
+└── val_loss_log.npy
+```
+
+`best_model.pt`는 다음 validation objective가 가장 낮은 epoch에서 저장됩니다.
+
+```text
+val_objective = (1 - SSIM_full) + 0.3 * (1 - SSIM_bbox)
+```
+
+최종 제출 체크포인트는 epoch index 38의 검증 결과로 선택되었고, 체크포인트의 `epoch` 값은 39입니다.
+
+## 6. 모델 설정
+
+PromptMR+의 기본 구조를 사용하되, 8 GB GPU에서 학습할 수 있도록 feature 크기를 줄였습니다.
+
+| 파라미터 | 사용 값 | PromptMR+ 원 설정 |
+|---|---:|---:|
+| `num_cascades` | 8 | 12 |
+| `n_feat0` | 8 | 48 |
+| `feature_dim` | [24, 32, 40] | [72, 96, 120] |
+| `prompt_dim` | [8, 16, 24] | [24, 48, 72] |
+| `sens_n_feat0` | 8 | 24 |
+| `sens_feature_dim` | [12, 16, 20] | - |
+| `sens_prompt_dim` | [4, 8, 12] | - |
+| `n_history` | 3 | 11 |
+| `num_adj_slices` | 1 | - |
+| `compute_sens_per_coil` | True | - |
+
+`compute_sens_per_coil=True`를 사용하여 sensitivity map을 coil 단위로 계산했습니다. GTX 1080에서 coil 병렬 계산보다 메모리 사용량이 적고 추론 시간도 조금 더 빨랐습니다.
+
+학습 시에는 gradient checkpointing을 사용했습니다.
+
+```text
+--use-checkpoint true
+```
+
+추론에서는 gradient checkpointing을 사용하지 않습니다.
+
+## 7. Loss
+
+학습 loss는 foreground SSIM loss와 bbox SSIM loss를 함께 사용합니다.
+
+```text
+loss = foreground_ssim_loss + 0.3 * bbox_ssim_loss
+```
+
+* foreground loss는 공식 foreground mask 내부의 SSIM으로 계산합니다.
+* bbox loss는 각 annotation box별 SSIM을 평균하여 계산합니다.
+* annotation이 없는 slice에서는 bbox loss를 적용하지 않습니다.
+* validation은 공식 metric과 동일하게 acc4와 acc8을 각각 계산한 뒤 동일한 비중으로 평균합니다.
+
+## 8. Data augmentation
+
+### K-space mask augmentation
+
+`utils/data/mask_augment.py`에서 acc4와 acc8 sampling mask를 새로 생성합니다.
+
+```text
+--mask-aug true
+--mask-aug-weight 1.0
+--mask-aug-start 16
+--mask-aug-schedule exp
+--mask-aug-plateau-epoch 25
+--mask-aug-accelerations 4 8
+--mask-aug-random-ratio 0.0
+--mask-aug-random-offset true
+```
+
+mask augmentation은 epoch 16부터 적용되며 epoch 25에서 최대 확률에 도달합니다.
+
+### MRAugment
+
+MRAugment는 image domain의 spatial transform을 k-space에 반영하는 방식으로 적용했습니다. annotation box에도 같은 좌표 변환을 적용하여 target과 box가 어긋나지 않도록 했습니다.
+
+```text
+--aug_on
+--aug_schedule exp
+--aug_delay 30
+--aug_strength 0.5
+--aug_exp_decay 5.0
+--aug_weight_translation 0.1
+--aug_weight_rotation 0.1
+--aug_weight_shearing 0.1
+--aug_weight_scaling 1.0
+--aug_weight_fliph 0.4
+--aug_weight_flipv 0.0
+--aug_weight_rot90 0.0
+```
+
+epoch 30까지는 augmentation 확률이 0이며 epoch 31부터 적용됩니다. Knee 영상의 방향성을 유지하기 위해 vertical flip과 90도 rotation은 사용하지 않았습니다.
+
+## 9. Reconstruction 및 평가
+
+최종 평가는 `recon_eval.sh`로 실행합니다.
+
+```bash
+cd FastMRI_challenge
+bash recon_eval.sh
+```
+
+`recon_eval.sh`는 다음 checkpoint를 불러옵니다.
+
+```text
+../result/promptmr8_metric_aligned_50ep_v1/checkpoints/best_model.pt
+```
+
+`recon_eval.py`는 reconstruction과 SSIM 계산을 한 번에 수행하며 다음 세 값을 출력합니다.
+
+* SSIM_full
+* SSIM_bbox
+* slice당 reconstruction time
+
+최종 채점에는 `recon_eval.sh`만 사용합니다. 아래 파일은 개발 및 확인 과정에서 사용한 것으로 최종 채점에는 사용하지 않습니다.
+
+* `recon_eval_cpuonly.py`: CPU에서 SSIM을 확인하기 위한 스크립트
+* `reconstruct.py`, `leaderboard_eval.py`: baseline의 분리 실행 경로
+* `benchmark_sens_per_coil.py`: sensitivity map 계산 방식 비교
+* `smoke_test_*.py`: 학습과 annotation 정렬 확인
+
+## 10. 추론 규칙
+
+`utils/learning/test_part.py`는 공식 `recon_eval.py`에서 요구하는 세 함수를 구현합니다.
+
+### `load_model()`
+
+`best_model.pt`에 저장된 학습 인자로 PromptMR+를 생성하고 weight를 불러옵니다.
+
+### `prep_volume()`
+
+H5 파일에서 원본 k-space와 sampling mask를 읽어 host memory에 보관합니다. 모델 연산이나 reconstruction은 수행하지 않으며, 중간 reconstruction이나 수정된 weight를 `ctx`에 저장하지 않습니다.
+
+### `recon_slice()`
+
+해당 slice의 mask 적용, tensor 변환, device 이동 및 model forward를 수행합니다. 실제 reconstruction 연산은 모두 이 함수 안에서 수행되므로 공식 per-slice 시간 측정에 포함됩니다.
+
+추론 시에는 image H5의 GRAPPA, annotation 및 bbox 정보를 사용하지 않습니다. 모델 입력은 k-space와 sampling mask뿐입니다.
+
+## 11. 재현성
+
+학습 seed는 430으로 고정했습니다.
+
+`utils/common/utils.py`의 `seed_fix()`에서 다음 항목을 설정합니다.
+
+```python
+torch.manual_seed(n)
+torch.cuda.manual_seed(n)
+torch.cuda.manual_seed_all(n)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+np.random.seed(n)
+random.seed(n)
+```
+
+또한 mask augmentation과 MRAugment는 각각 별도의 seeded `RandomState`를 사용합니다. DataLoader는 별도 worker를 사용하지 않으므로 worker별 seed 차이가 없습니다.
+
+CUDA 연산 특성상 전체 학습이 bit-identical하게 재현되지는 않습니다. 초기 weight와 데이터 순서는 동일하게 재현되지만, 일부 CUDA backward 연산의 부동소수점 누적 순서로 인해 iteration별 loss는 소수점 아래에서 조금씩 달라질 수 있습니다.
+
+4 epoch 재학습에서 iteration 0 loss는 원본 학습과 같은 `0.6352`였고, 이후 loss는 네 번째 유효숫자 부근부터 차이가 발생했습니다. 해당 로그는 `experiments/repro4_seed430.log`에 저장했습니다.
+
+재현성 관련 파일은 다음과 같습니다.
+
+| 파일 | 내용 |
+|---|---|
+| `experiments/train_stdout.log` | 50 epoch 전체 학습 로그 |
+| `experiments/repro4_seed430.log` | seed 430 초기 4 epoch 재학습 로그 |
+| `experiments/val_loss_log.npy` | epoch별 loss 기록 |
+| `experiments/code_before_train.tar.gz` | 최종 학습 직전 코드 스냅샷 |
+| `experiments/evidence/pip_freeze.txt` | 전체 Python 패키지 목록 |
+| `experiments/recon_eval_gpu.log` | 최종 GPU 평가 로그 |
+| `experiments/recon_eval_cpu.log` | CPU/GPU SSIM 교차 확인 로그 |
+
+VESSL 학습 터미널도 삭제하지 않고 보존했습니다.
+
+## 12. Validation 결과
+
+50 epoch 학습의 마지막 epoch 결과는 다음과 같습니다.
+
+| Acceleration | SSIM_full | SSIM_bbox |
+|---|---:|---:|
+| acc4 | 0.9222 | 0.9455 |
+| acc8 | 0.8972 | 0.9383 |
+| 평균 | 0.9097 | 0.9419 |
+
+최종 checkpoint는 마지막 epoch가 아니라 validation objective가 가장 낮았던 epoch 39 checkpoint입니다.
+
+## 13. 주요 파일
+
+```text
+FastMRI_challenge/
+├── README.md
+├── requirements.txt
+├── train.py
+├── train.sh
+├── recon_eval.py
+├── recon_eval.sh
+├── experiments/
+│   ├── train_stdout.log
+│   ├── repro4_seed430.log
+│   ├── recon_eval_gpu.log
+│   ├── recon_eval_cpu.log
+│   ├── val_loss_log.npy
+│   └── evidence/
+│       └── pip_freeze.txt
+└── utils/
+    ├── common/
+    │   ├── loss_function.py
+    │   ├── metrics.py
+    │   └── utils.py
+    ├── data/
+    │   ├── annotation_utils.py
+    │   ├── load_data.py
+    │   ├── mask_augment.py
+    │   ├── transforms.py
+    │   └── mraugment/
+    ├── learning/
+    │   ├── train_part.py
+    │   └── test_part.py
+    └── model/
+        ├── promptmr_plus.py
+        ├── reentrant_wrapper.py
+        └── fastmri/
+```
+
+## 14. References
+
+1. Xin, B., Ye, M., Axel, L., and Metaxas, D. N. *Rethinking Deep Unrolled Model for Accelerated MRI Reconstruction*. ECCV 2024.
+2. Fabian, Z., Heckel, R., and Soltanolkotabi, M. *Data Augmentation for Deep Learning Based Accelerated MRI Reconstruction with Limited Data*. ICML 2021.
+3. Zbontar, J. et al. *fastMRI: An Open Dataset and Benchmarks for Accelerated MRI*. The fastMRI components included in `utils/model/fastmri/` are distributed under the MIT License.
+4. Zhao, R. et al. *fastMRI+: Clinical Pathology Annotations for the fastMRI Dataset*.
