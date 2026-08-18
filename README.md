@@ -123,7 +123,6 @@ bash /any/path/FastMRI_challenge/train.sh         # 학습
 bash recon_eval.sh /path/to/leaderboard
 bash train.sh      /path/to/Data          # 하위에 train/, val/ 가 있는 디렉터리
 bash train.sh      /path/to/Data  my_run  # 실험 이름도 변경
-GPU_NUM=1 bash recon_eval.sh              # GPU 번호 변경
 ```
 
 ### 4-3. 체크포인트 위치
