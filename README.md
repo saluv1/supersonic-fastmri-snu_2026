@@ -143,18 +143,26 @@ SHA-256: 47530c3c029fb25674a9a582795fd05ffd272265f30c62c89b5471ec2a485e8c
 제거했습니다. 현재 `backups/`를 제외한 모든 `.py` / `.sh`에 절대경로가 없습니다.
 
 **셸 스크립트 4종** (`train.sh`, `recon_eval.sh`, `reconstruct.sh`,
-`leaderboard_eval.sh`)
+`leaderboard_eval.sh`) — 모두 스크립트 자신의 위치로 이동한 뒤 실행하므로
+어느 디렉터리에서 호출해도 동작합니다.
+
+`train.sh` / `recon_eval.sh` / `reconstruct.sh`
+
+```bash
+cd "$(dirname "$0")"
+DATA_ROOT="${1:-../Data}"                                   # 또는 ../Data/leaderboard
+NET_NAME="${2:-promptmr8_metric_aligned_50ep_v1}"
+```
+
+`leaderboard_eval.sh`
 
 ```bash
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")"; pwd)"
 cd "$SCRIPT_DIR"
-DATA_ROOT="${1:-$SCRIPT_DIR/../Data}"
-NET_NAME="${2:-promptmr8_metric_aligned_50ep_v1}"
-GPU_NUM="${GPU_NUM:-0}"
 ```
 
-* `cd /root/FastMRI_challenge` → `cd "$SCRIPT_DIR"`
-* 데이터·출력 경로를 전부 `$SCRIPT_DIR` 기준 또는 인자로 전환
+* `cd /root/FastMRI_challenge` → 스크립트 위치 기준 이동
+* 데이터·출력 경로를 전부 상대경로 또는 인자로 전환
 * `reconstruct.sh`의 죽은 기본값 `test_Varnet` 제거
 
 **파이썬 argparse 기본값** (`train.py`, `smoke_test_bbox_train.py`,
