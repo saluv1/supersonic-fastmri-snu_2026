@@ -1,0 +1,223 @@
+Current cuda device: 0
+[ACS] sanity check passed on 8 volumes
+Model params: 6.01M
+[Sensitivity] compute_sens_per_coil=True
+[LR] MultiStepLR enabled | initial=0.0002 milestones=[16, 27] gamma=0.3
+[Loss] foreground_ssim + 0.3 * bbox_ssim
+[Validation] official foreground/bbox metrics with equal acc4/acc8 weighting
+[MaskAug] enabled | acc=[4, 8] random_ratio=0.0 schedule=exp start=16 plateau=25
+[MRAugment] enabled | schedule=exp delay=30 strength=0.5 max_epochs=31
+Epoch # 0 ............... promptmr8_metric_aligned_repro4_seed430 ............... LR=0.0002
+  mask-aug p = 0.000
+  mr-aug   p = 0.000
+Epoch = [  0/  4] Iter = [   0/4651] Loss = 0.6352 Full = 0.6352 BBox = 0 Boxes = 0 Time = 3.3082s
+Epoch = [  0/  4] Iter = [ 100/4651] Loss = 0.1675 Full = 0.1229 BBox = 0.1486 Boxes = 1 Time = 217.3393s
+Epoch = [  0/  4] Iter = [ 200/4651] Loss = 0.08387 Full = 0.08387 BBox = 0 Boxes = 0 Time = 215.8462s
+Epoch = [  0/  4] Iter = [ 300/4651] Loss = 0.09682 Full = 0.09682 BBox = 0 Boxes = 0 Time = 216.1659s
+Epoch = [  0/  4] Iter = [ 400/4651] Loss = 0.1871 Full = 0.1871 BBox = 0 Boxes = 0 Time = 215.6688s
+Epoch = [  0/  4] Iter = [ 500/4651] Loss = 0.2863 Full = 0.2169 BBox = 0.2314 Boxes = 3 Time = 217.6583s
+Epoch = [  0/  4] Iter = [ 600/4651] Loss = 0.1177 Full = 0.1177 BBox = 0 Boxes = 0 Time = 216.0762s
+Epoch = [  0/  4] Iter = [ 700/4651] Loss = 0.1354 Full = 0.09214 BBox = 0.1441 Boxes = 1 Time = 215.8681s
+Epoch = [  0/  4] Iter = [ 800/4651] Loss = 0.1682 Full = 0.1682 BBox = 0 Boxes = 0 Time = 215.8162s
+Epoch = [  0/  4] Iter = [ 900/4651] Loss = 0.09502 Full = 0.07018 BBox = 0.08278 Boxes = 1 Time = 215.5234s
+Epoch = [  0/  4] Iter = [1000/4651] Loss = 0.1418 Full = 0.1006 BBox = 0.1371 Boxes = 2 Time = 215.4023s
+Epoch = [  0/  4] Iter = [1100/4651] Loss = 0.2011 Full = 0.17 BBox = 0.1035 Boxes = 1 Time = 216.4842s
+Epoch = [  0/  4] Iter = [1200/4651] Loss = 0.1391 Full = 0.1391 BBox = 0 Boxes = 0 Time = 221.4717s
+Epoch = [  0/  4] Iter = [1300/4651] Loss = 0.08434 Full = 0.08434 BBox = 0 Boxes = 0 Time = 215.4529s
+Epoch = [  0/  4] Iter = [1400/4651] Loss = 0.1288 Full = 0.0932 BBox = 0.1188 Boxes = 1 Time = 216.2206s
+Epoch = [  0/  4] Iter = [1500/4651] Loss = 0.1446 Full = 0.1446 BBox = 0 Boxes = 0 Time = 216.2350s
+Epoch = [  0/  4] Iter = [1600/4651] Loss = 0.1268 Full = 0.1268 BBox = 0 Boxes = 0 Time = 216.3825s
+Epoch = [  0/  4] Iter = [1700/4651] Loss = 0.1135 Full = 0.09143 BBox = 0.07365 Boxes = 2 Time = 215.9648s
+Epoch = [  0/  4] Iter = [1800/4651] Loss = 0.07506 Full = 0.07506 BBox = 0 Boxes = 0 Time = 215.5841s
+Epoch = [  0/  4] Iter = [1900/4651] Loss = 0.2569 Full = 0.2159 BBox = 0.1367 Boxes = 1 Time = 216.7116s
+Epoch = [  0/  4] Iter = [2000/4651] Loss = 0.1833 Full = 0.1833 BBox = 0 Boxes = 0 Time = 216.2065s
+Epoch = [  0/  4] Iter = [2100/4651] Loss = 0.1409 Full = 0.1409 BBox = 0 Boxes = 0 Time = 216.4559s
+Epoch = [  0/  4] Iter = [2200/4651] Loss = 0.2466 Full = 0.1793 BBox = 0.2241 Boxes = 2 Time = 216.2080s
+Epoch = [  0/  4] Iter = [2300/4651] Loss = 0.01667 Full = 0.01667 BBox = 0 Boxes = 0 Time = 215.9664s
+Epoch = [  0/  4] Iter = [2400/4651] Loss = 0.1784 Full = 0.1458 BBox = 0.1085 Boxes = 1 Time = 215.5814s
+Epoch = [  0/  4] Iter = [2500/4651] Loss = 0.196 Full = 0.1082 BBox = 0.2927 Boxes = 1 Time = 216.0929s
+Epoch = [  0/  4] Iter = [2600/4651] Loss = 0.07432 Full = 0.05917 BBox = 0.0505 Boxes = 2 Time = 215.8701s
+Epoch = [  0/  4] Iter = [2700/4651] Loss = 0.1286 Full = 0.1286 BBox = 0 Boxes = 0 Time = 216.5197s
+Epoch = [  0/  4] Iter = [2800/4651] Loss = 0.07445 Full = 0.05688 BBox = 0.05856 Boxes = 1 Time = 216.7444s
+Epoch = [  0/  4] Iter = [2900/4651] Loss = 0.09098 Full = 0.06369 BBox = 0.09094 Boxes = 2 Time = 215.4677s
+Epoch = [  0/  4] Iter = [3000/4651] Loss = 0.1712 Full = 0.1296 BBox = 0.1386 Boxes = 1 Time = 215.3182s
+Epoch = [  0/  4] Iter = [3100/4651] Loss = 0.07947 Full = 0.07947 BBox = 0 Boxes = 0 Time = 216.0656s
+Epoch = [  0/  4] Iter = [3200/4651] Loss = 0.1485 Full = 0.1485 BBox = 0 Boxes = 0 Time = 216.4470s
+Epoch = [  0/  4] Iter = [3300/4651] Loss = 0.04507 Full = 0.04507 BBox = 0 Boxes = 0 Time = 215.6513s
+Epoch = [  0/  4] Iter = [3400/4651] Loss = 0.07545 Full = 0.07545 BBox = 0 Boxes = 0 Time = 215.3241s
+Epoch = [  0/  4] Iter = [3500/4651] Loss = 0.2404 Full = 0.2404 BBox = 0 Boxes = 0 Time = 214.9026s
+Epoch = [  0/  4] Iter = [3600/4651] Loss = 0.164 Full = 0.164 BBox = 0 Boxes = 0 Time = 215.4837s
+Epoch = [  0/  4] Iter = [3700/4651] Loss = 0.1211 Full = 0.08908 BBox = 0.1066 Boxes = 1 Time = 215.2724s
+Epoch = [  0/  4] Iter = [3800/4651] Loss = 0.1635 Full = 0.1635 BBox = 0 Boxes = 0 Time = 215.3638s
+Epoch = [  0/  4] Iter = [3900/4651] Loss = 0.07801 Full = 0.07801 BBox = 0 Boxes = 0 Time = 215.5187s
+Epoch = [  0/  4] Iter = [4000/4651] Loss = 0.06883 Full = 0.06883 BBox = 0 Boxes = 0 Time = 215.9405s
+Epoch = [  0/  4] Iter = [4100/4651] Loss = 0.08961 Full = 0.0672 BBox = 0.0747 Boxes = 4 Time = 216.7908s
+Epoch = [  0/  4] Iter = [4200/4651] Loss = 0.1256 Full = 0.1256 BBox = 0 Boxes = 0 Time = 216.4180s
+Epoch = [  0/  4] Iter = [4300/4651] Loss = 0.1174 Full = 0.1174 BBox = 0 Boxes = 0 Time = 216.5634s
+Epoch = [  0/  4] Iter = [4400/4651] Loss = 0.1138 Full = 0.09851 BBox = 0.05088 Boxes = 1 Time = 215.9694s
+Epoch = [  0/  4] Iter = [4500/4651] Loss = 0.1582 Full = 0.1188 BBox = 0.1313 Boxes = 1 Time = 215.8978s
+Epoch = [  0/  4] Iter = [4600/4651] Loss = 0.1184 Full = 0.08512 BBox = 0.1108 Boxes = 3 Time = 216.1652s
+Epoch = [   0/   4] Train = 0.1283 TrainFull = 0.1151 TrainBBox = 0.1114 ValFull = 0.1018 ValBBox = 0.07789 ValObjective = 0.1251 ValSSIMFull = 0.8982 ValSSIMBBox = 0.9221 TrainAnnotatedSlices = 1824 TrainBoxes = 2593 ValAnnotatedSlices = 110 ValBoxes = 161 ValFullSlices = 791 LR = 0.0002 NextLR = 0.0002 TrainTime = 10052.8403s ValTime = 333.2855s
+  Official validation by acceleration | full={'acc4': 0.9142195014168648, 'acc8': 0.8822261217671136} bbox={'acc4': 0.934883718178651, 'acc8': 0.9093382468929997}
+@@@@@@@@@@@@@@@@@@@@NewRecord@@@@@@@@@@@@@@@@@@@@
+ForwardTime = 0.4112s
+Epoch # 1 ............... promptmr8_metric_aligned_repro4_seed430 ............... LR=0.0002
+  mask-aug p = 0.000
+  mr-aug   p = 0.000
+Epoch = [  1/  4] Iter = [   0/4651] Loss = 0.08842 Full = 0.08842 BBox = 0 Boxes = 0 Time = 2.1405s
+Epoch = [  1/  4] Iter = [ 100/4651] Loss = 0.04977 Full = 0.04977 BBox = 0 Boxes = 0 Time = 215.9867s
+Epoch = [  1/  4] Iter = [ 200/4651] Loss = 0.2095 Full = 0.1459 BBox = 0.2119 Boxes = 2 Time = 215.7495s
+Epoch = [  1/  4] Iter = [ 300/4651] Loss = 0.19 Full = 0.1494 BBox = 0.1353 Boxes = 2 Time = 215.7227s
+Epoch = [  1/  4] Iter = [ 400/4651] Loss = 0.2162 Full = 0.1495 BBox = 0.2225 Boxes = 1 Time = 215.4488s
+Epoch = [  1/  4] Iter = [ 500/4651] Loss = 0.2164 Full = 0.1769 BBox = 0.1315 Boxes = 2 Time = 216.2434s
+Epoch = [  1/  4] Iter = [ 600/4651] Loss = 0.1018 Full = 0.1018 BBox = 0 Boxes = 0 Time = 216.8321s
+Epoch = [  1/  4] Iter = [ 700/4651] Loss = 0.08823 Full = 0.07394 BBox = 0.04765 Boxes = 2 Time = 216.4754s
+Epoch = [  1/  4] Iter = [ 800/4651] Loss = 0.06226 Full = 0.06226 BBox = 0 Boxes = 0 Time = 215.6862s
+Epoch = [  1/  4] Iter = [ 900/4651] Loss = 0.1702 Full = 0.1702 BBox = 0 Boxes = 0 Time = 216.4439s
+Epoch = [  1/  4] Iter = [1000/4651] Loss = 0.1249 Full = 0.1249 BBox = 0 Boxes = 0 Time = 215.7324s
+Epoch = [  1/  4] Iter = [1100/4651] Loss = 0.2159 Full = 0.1632 BBox = 0.1757 Boxes = 1 Time = 217.1024s
+Epoch = [  1/  4] Iter = [1200/4651] Loss = 0.05363 Full = 0.05363 BBox = 0 Boxes = 0 Time = 215.5171s
+Epoch = [  1/  4] Iter = [1300/4651] Loss = 0.1478 Full = 0.1478 BBox = 0 Boxes = 0 Time = 216.6553s
+Epoch = [  1/  4] Iter = [1400/4651] Loss = 0.2513 Full = 0.1854 BBox = 0.2198 Boxes = 1 Time = 215.8290s
+Epoch = [  1/  4] Iter = [1500/4651] Loss = 0.1091 Full = 0.08752 BBox = 0.07206 Boxes = 2 Time = 216.2770s
+Epoch = [  1/  4] Iter = [1600/4651] Loss = 0.07482 Full = 0.07482 BBox = 0 Boxes = 0 Time = 216.0563s
+Epoch = [  1/  4] Iter = [1700/4651] Loss = 0.04821 Full = 0.03714 BBox = 0.0369 Boxes = 1 Time = 216.3749s
+Epoch = [  1/  4] Iter = [1800/4651] Loss = 0.0947 Full = 0.07115 BBox = 0.07851 Boxes = 1 Time = 215.8631s
+Epoch = [  1/  4] Iter = [1900/4651] Loss = 0.07482 Full = 0.07482 BBox = 0 Boxes = 0 Time = 222.3136s
+Epoch = [  1/  4] Iter = [2000/4651] Loss = 0.1022 Full = 0.1022 BBox = 0 Boxes = 0 Time = 215.8452s
+Epoch = [  1/  4] Iter = [2100/4651] Loss = 0.1153 Full = 0.08974 BBox = 0.08526 Boxes = 2 Time = 217.2593s
+Epoch = [  1/  4] Iter = [2200/4651] Loss = 0.09398 Full = 0.09398 BBox = 0 Boxes = 0 Time = 216.0631s
+Epoch = [  1/  4] Iter = [2300/4651] Loss = 0.09876 Full = 0.09876 BBox = 0 Boxes = 0 Time = 214.7747s
+Epoch = [  1/  4] Iter = [2400/4651] Loss = 0.2171 Full = 0.1923 BBox = 0.08275 Boxes = 1 Time = 215.5800s
+Epoch = [  1/  4] Iter = [2500/4651] Loss = 0.04172 Full = 0.04172 BBox = 0 Boxes = 0 Time = 216.2001s
+Epoch = [  1/  4] Iter = [2600/4651] Loss = 0.1278 Full = 0.1278 BBox = 0 Boxes = 0 Time = 216.7713s
+Epoch = [  1/  4] Iter = [2700/4651] Loss = 0.1128 Full = 0.1128 BBox = 0 Boxes = 0 Time = 216.1680s
+Epoch = [  1/  4] Iter = [2800/4651] Loss = 0.1067 Full = 0.1067 BBox = 0 Boxes = 0 Time = 214.8282s
+Epoch = [  1/  4] Iter = [2900/4651] Loss = 0.1219 Full = 0.1219 BBox = 0 Boxes = 0 Time = 215.8792s
+Epoch = [  1/  4] Iter = [3000/4651] Loss = 0.1451 Full = 0.1451 BBox = 0 Boxes = 0 Time = 215.5975s
+Epoch = [  1/  4] Iter = [3100/4651] Loss = 0.07665 Full = 0.06037 BBox = 0.05426 Boxes = 2 Time = 215.9180s
+Epoch = [  1/  4] Iter = [3200/4651] Loss = 0.06201 Full = 0.04862 BBox = 0.04464 Boxes = 2 Time = 215.8832s
+Epoch = [  1/  4] Iter = [3300/4651] Loss = 0.1962 Full = 0.1467 BBox = 0.1648 Boxes = 2 Time = 216.9410s
+Epoch = [  1/  4] Iter = [3400/4651] Loss = 0.08779 Full = 0.08779 BBox = 0 Boxes = 0 Time = 216.2618s
+Epoch = [  1/  4] Iter = [3500/4651] Loss = 0.09933 Full = 0.08798 BBox = 0.03786 Boxes = 1 Time = 215.7295s
+Epoch = [  1/  4] Iter = [3600/4651] Loss = 0.08449 Full = 0.08449 BBox = 0 Boxes = 0 Time = 215.2607s
+Epoch = [  1/  4] Iter = [3700/4651] Loss = 0.09759 Full = 0.09759 BBox = 0 Boxes = 0 Time = 215.9009s
+Epoch = [  1/  4] Iter = [3800/4651] Loss = 0.03816 Full = 0.03816 BBox = 0 Boxes = 0 Time = 217.0118s
+Epoch = [  1/  4] Iter = [3900/4651] Loss = 0.1159 Full = 0.1159 BBox = 0 Boxes = 0 Time = 216.6753s
+Epoch = [  1/  4] Iter = [4000/4651] Loss = 0.1566 Full = 0.1283 BBox = 0.09419 Boxes = 2 Time = 215.5190s
+Epoch = [  1/  4] Iter = [4100/4651] Loss = 0.0634 Full = 0.05571 BBox = 0.02563 Boxes = 1 Time = 217.5538s
+Epoch = [  1/  4] Iter = [4200/4651] Loss = 0.09663 Full = 0.09663 BBox = 0 Boxes = 0 Time = 218.8983s
+Epoch = [  1/  4] Iter = [4300/4651] Loss = 0.06913 Full = 0.06913 BBox = 0 Boxes = 0 Time = 215.7794s
+Epoch = [  1/  4] Iter = [4400/4651] Loss = 0.07742 Full = 0.07742 BBox = 0 Boxes = 0 Time = 215.7399s
+Epoch = [  1/  4] Iter = [4500/4651] Loss = 0.0551 Full = 0.0551 BBox = 0 Boxes = 0 Time = 216.2164s
+Epoch = [  1/  4] Iter = [4600/4651] Loss = 0.0882 Full = 0.0882 BBox = 0 Boxes = 0 Time = 216.2163s
+Epoch = [   1/   4] Train = 0.1116 TrainFull = 0.1007 TrainBBox = 0.09166 ValFull = 0.09698 ValBBox = 0.07009 ValObjective = 0.118 ValSSIMFull = 0.9030 ValSSIMBBox = 0.9299 TrainAnnotatedSlices = 1824 TrainBoxes = 2593 ValAnnotatedSlices = 110 ValBoxes = 161 ValFullSlices = 791 LR = 0.0002 NextLR = 0.0002 TrainTime = 10058.9833s ValTime = 327.2456s
+  Official validation by acceleration | full={'acc4': 0.918063173569391, 'acc8': 0.8879817991207043} bbox={'acc4': 0.938840680033247, 'acc8': 0.9209839017302902}
+@@@@@@@@@@@@@@@@@@@@NewRecord@@@@@@@@@@@@@@@@@@@@
+ForwardTime = 7.1699s
+Epoch # 2 ............... promptmr8_metric_aligned_repro4_seed430 ............... LR=0.0002
+  mask-aug p = 0.000
+  mr-aug   p = 0.000
+Epoch = [  2/  4] Iter = [   0/4651] Loss = 0.1414 Full = 0.1112 BBox = 0.1005 Boxes = 1 Time = 2.1995s
+Epoch = [  2/  4] Iter = [ 100/4651] Loss = 0.04831 Full = 0.04831 BBox = 0 Boxes = 0 Time = 216.1465s
+Epoch = [  2/  4] Iter = [ 200/4651] Loss = 0.1101 Full = 0.1101 BBox = 0 Boxes = 0 Time = 216.3250s
+Epoch = [  2/  4] Iter = [ 300/4651] Loss = 0.123 Full = 0.123 BBox = 0 Boxes = 0 Time = 216.5944s
+Epoch = [  2/  4] Iter = [ 400/4651] Loss = 0.07872 Full = 0.07872 BBox = 0 Boxes = 0 Time = 216.4662s
+Epoch = [  2/  4] Iter = [ 500/4651] Loss = 0.07039 Full = 0.07039 BBox = 0 Boxes = 0 Time = 216.4867s
+Epoch = [  2/  4] Iter = [ 600/4651] Loss = 0.1123 Full = 0.08995 BBox = 0.07437 Boxes = 3 Time = 215.8929s
+Epoch = [  2/  4] Iter = [ 700/4651] Loss = 0.1337 Full = 0.1022 BBox = 0.105 Boxes = 3 Time = 217.0610s
+Epoch = [  2/  4] Iter = [ 800/4651] Loss = 0.1419 Full = 0.1419 BBox = 0 Boxes = 0 Time = 216.0640s
+Epoch = [  2/  4] Iter = [ 900/4651] Loss = 0.07587 Full = 0.07587 BBox = 0 Boxes = 0 Time = 216.4003s
+Epoch = [  2/  4] Iter = [1000/4651] Loss = 0.05629 Full = 0.05629 BBox = 0 Boxes = 0 Time = 215.4195s
+Epoch = [  2/  4] Iter = [1100/4651] Loss = 0.0636 Full = 0.0636 BBox = 0 Boxes = 0 Time = 215.8096s
+Epoch = [  2/  4] Iter = [1200/4651] Loss = 0.1192 Full = 0.1192 BBox = 0 Boxes = 0 Time = 216.3279s
+Epoch = [  2/  4] Iter = [1300/4651] Loss = 0.04931 Full = 0.04931 BBox = 0 Boxes = 0 Time = 215.4795s
+Epoch = [  2/  4] Iter = [1400/4651] Loss = 0.0997 Full = 0.0997 BBox = 0 Boxes = 0 Time = 215.4596s
+Epoch = [  2/  4] Iter = [1500/4651] Loss = 0.1044 Full = 0.1044 BBox = 0 Boxes = 0 Time = 216.3716s
+Epoch = [  2/  4] Iter = [1600/4651] Loss = 0.06331 Full = 0.06331 BBox = 0 Boxes = 0 Time = 214.7321s
+Epoch = [  2/  4] Iter = [1700/4651] Loss = 0.0926 Full = 0.0926 BBox = 0 Boxes = 0 Time = 220.7860s
+Epoch = [  2/  4] Iter = [1800/4651] Loss = 0.1847 Full = 0.1476 BBox = 0.1237 Boxes = 1 Time = 215.9642s
+Epoch = [  2/  4] Iter = [1900/4651] Loss = 0.07931 Full = 0.07931 BBox = 0 Boxes = 0 Time = 215.9015s
+Epoch = [  2/  4] Iter = [2000/4651] Loss = 0.1873 Full = 0.1594 BBox = 0.09304 Boxes = 1 Time = 216.5291s
+Epoch = [  2/  4] Iter = [2100/4651] Loss = 0.1608 Full = 0.1253 BBox = 0.1183 Boxes = 1 Time = 216.5929s
+Epoch = [  2/  4] Iter = [2200/4651] Loss = 0.07387 Full = 0.07387 BBox = 0 Boxes = 0 Time = 216.4113s
+Epoch = [  2/  4] Iter = [2300/4651] Loss = 0.08618 Full = 0.08618 BBox = 0 Boxes = 0 Time = 215.2710s
+Epoch = [  2/  4] Iter = [2400/4651] Loss = 0.08221 Full = 0.06339 BBox = 0.06273 Boxes = 1 Time = 215.8044s
+Epoch = [  2/  4] Iter = [2500/4651] Loss = 0.07146 Full = 0.05522 BBox = 0.05412 Boxes = 2 Time = 216.1646s
+Epoch = [  2/  4] Iter = [2600/4651] Loss = 0.05456 Full = 0.05456 BBox = 0 Boxes = 0 Time = 216.4569s
+Epoch = [  2/  4] Iter = [2700/4651] Loss = 0.08244 Full = 0.06236 BBox = 0.06695 Boxes = 1 Time = 215.5108s
+Epoch = [  2/  4] Iter = [2800/4651] Loss = 0.08401 Full = 0.08401 BBox = 0 Boxes = 0 Time = 215.5043s
+Epoch = [  2/  4] Iter = [2900/4651] Loss = 0.1375 Full = 0.1375 BBox = 0 Boxes = 0 Time = 221.6999s
+Epoch = [  2/  4] Iter = [3000/4651] Loss = 0.1085 Full = 0.07731 BBox = 0.1038 Boxes = 1 Time = 215.6180s
+Epoch = [  2/  4] Iter = [3100/4651] Loss = 0.08489 Full = 0.08489 BBox = 0 Boxes = 0 Time = 215.9769s
+Epoch = [  2/  4] Iter = [3200/4651] Loss = 0.1995 Full = 0.1589 BBox = 0.1354 Boxes = 1 Time = 214.8739s
+Epoch = [  2/  4] Iter = [3300/4651] Loss = 0.1398 Full = 0.1398 BBox = 0 Boxes = 0 Time = 216.2702s
+Epoch = [  2/  4] Iter = [3400/4651] Loss = 0.2094 Full = 0.1711 BBox = 0.1275 Boxes = 1 Time = 216.5949s
+Epoch = [  2/  4] Iter = [3500/4651] Loss = 0.1406 Full = 0.1086 BBox = 0.1068 Boxes = 1 Time = 215.2508s
+Epoch = [  2/  4] Iter = [3600/4651] Loss = 0.1512 Full = 0.1147 BBox = 0.1214 Boxes = 2 Time = 216.2817s
+Epoch = [  2/  4] Iter = [3700/4651] Loss = 0.1585 Full = 0.1354 BBox = 0.07721 Boxes = 1 Time = 221.2879s
+Epoch = [  2/  4] Iter = [3800/4651] Loss = 0.1476 Full = 0.12 BBox = 0.09232 Boxes = 1 Time = 221.2914s
+Epoch = [  2/  4] Iter = [3900/4651] Loss = 0.04133 Full = 0.04133 BBox = 0 Boxes = 0 Time = 216.2717s
+Epoch = [  2/  4] Iter = [4000/4651] Loss = 0.09531 Full = 0.09531 BBox = 0 Boxes = 0 Time = 215.4420s
+Epoch = [  2/  4] Iter = [4100/4651] Loss = 0.118 Full = 0.09387 BBox = 0.08053 Boxes = 2 Time = 215.7754s
+Epoch = [  2/  4] Iter = [4200/4651] Loss = 0.108 Full = 0.108 BBox = 0 Boxes = 0 Time = 216.4080s
+Epoch = [  2/  4] Iter = [4300/4651] Loss = 0.201 Full = 0.156 BBox = 0.1499 Boxes = 1 Time = 216.1835s
+Epoch = [  2/  4] Iter = [4400/4651] Loss = 0.1142 Full = 0.1142 BBox = 0 Boxes = 0 Time = 215.2929s
+Epoch = [  2/  4] Iter = [4500/4651] Loss = 0.1113 Full = 0.1113 BBox = 0 Boxes = 0 Time = 216.4875s
+Epoch = [  2/  4] Iter = [4600/4651] Loss = 0.2104 Full = 0.2104 BBox = 0 Boxes = 0 Time = 215.7907s
+Epoch = [   2/   4] Train = 0.108 TrainFull = 0.09773 TrainBBox = 0.08677 ValFull = 0.09545 ValBBox = 0.06993 ValObjective = 0.1164 ValSSIMFull = 0.9045 ValSSIMBBox = 0.9301 TrainAnnotatedSlices = 1824 TrainBoxes = 2593 ValAnnotatedSlices = 110 ValBoxes = 161 ValFullSlices = 791 LR = 0.0002 NextLR = 0.0002 TrainTime = 10066.8625s ValTime = 331.8443s
+  Official validation by acceleration | full={'acc4': 0.9192148492435859, 'acc8': 0.8898814090838035} bbox={'acc4': 0.9409035784061824, 'acc8': 0.9192367913546385}
+@@@@@@@@@@@@@@@@@@@@NewRecord@@@@@@@@@@@@@@@@@@@@
+ForwardTime = 7.2208s
+Epoch # 3 ............... promptmr8_metric_aligned_repro4_seed430 ............... LR=0.0002
+  mask-aug p = 0.000
+  mr-aug   p = 0.000
+Epoch = [  3/  4] Iter = [   0/4651] Loss = 0.05352 Full = 0.05352 BBox = 0 Boxes = 0 Time = 2.1917s
+Epoch = [  3/  4] Iter = [ 100/4651] Loss = 0.1026 Full = 0.1026 BBox = 0 Boxes = 0 Time = 215.6563s
+Epoch = [  3/  4] Iter = [ 200/4651] Loss = 0.0367 Full = 0.03 BBox = 0.02233 Boxes = 1 Time = 215.7363s
+Epoch = [  3/  4] Iter = [ 300/4651] Loss = 0.1088 Full = 0.1088 BBox = 0 Boxes = 0 Time = 216.0148s
+Epoch = [  3/  4] Iter = [ 400/4651] Loss = 0.1359 Full = 0.1359 BBox = 0 Boxes = 0 Time = 216.5045s
+Epoch = [  3/  4] Iter = [ 500/4651] Loss = 0.1638 Full = 0.1241 BBox = 0.1321 Boxes = 1 Time = 215.1852s
+Epoch = [  3/  4] Iter = [ 600/4651] Loss = 0.07794 Full = 0.07794 BBox = 0 Boxes = 0 Time = 215.7970s
+Epoch = [  3/  4] Iter = [ 700/4651] Loss = 0.05471 Full = 0.05471 BBox = 0 Boxes = 0 Time = 216.6651s
+Epoch = [  3/  4] Iter = [ 800/4651] Loss = 0.1304 Full = 0.1115 BBox = 0.06281 Boxes = 1 Time = 216.4742s
+Epoch = [  3/  4] Iter = [ 900/4651] Loss = 0.1235 Full = 0.1235 BBox = 0 Boxes = 0 Time = 217.5817s
+Epoch = [  3/  4] Iter = [1000/4651] Loss = 0.2048 Full = 0.2048 BBox = 0 Boxes = 0 Time = 215.4015s
+Epoch = [  3/  4] Iter = [1100/4651] Loss = 0.1922 Full = 0.1742 BBox = 0.05984 Boxes = 1 Time = 216.2295s
+Epoch = [  3/  4] Iter = [1200/4651] Loss = 0.06273 Full = 0.06273 BBox = 0 Boxes = 0 Time = 215.5599s
+Epoch = [  3/  4] Iter = [1300/4651] Loss = 0.1555 Full = 0.1212 BBox = 0.1145 Boxes = 1 Time = 220.8627s
+Epoch = [  3/  4] Iter = [1400/4651] Loss = 0.1007 Full = 0.08121 BBox = 0.06504 Boxes = 1 Time = 216.8533s
+Epoch = [  3/  4] Iter = [1500/4651] Loss = 0.0827 Full = 0.06087 BBox = 0.07274 Boxes = 1 Time = 215.9542s
+Epoch = [  3/  4] Iter = [1600/4651] Loss = 0.1268 Full = 0.1268 BBox = 0 Boxes = 0 Time = 215.9919s
+Epoch = [  3/  4] Iter = [1700/4651] Loss = 0.0756 Full = 0.05741 BBox = 0.06064 Boxes = 1 Time = 215.5786s
+Epoch = [  3/  4] Iter = [1800/4651] Loss = 0.05296 Full = 0.0382 BBox = 0.04919 Boxes = 2 Time = 215.5901s
+Epoch = [  3/  4] Iter = [1900/4651] Loss = 0.1464 Full = 0.1464 BBox = 0 Boxes = 0 Time = 216.6403s
+Epoch = [  3/  4] Iter = [2000/4651] Loss = 0.2544 Full = 0.1855 BBox = 0.2297 Boxes = 1 Time = 219.9130s
+Epoch = [  3/  4] Iter = [2100/4651] Loss = 0.1037 Full = 0.07723 BBox = 0.08836 Boxes = 1 Time = 216.3574s
+Epoch = [  3/  4] Iter = [2200/4651] Loss = 0.1522 Full = 0.1522 BBox = 0 Boxes = 0 Time = 215.3937s
+Epoch = [  3/  4] Iter = [2300/4651] Loss = 0.03898 Full = 0.03898 BBox = 0 Boxes = 0 Time = 216.5608s
+Epoch = [  3/  4] Iter = [2400/4651] Loss = 0.1716 Full = 0.1716 BBox = 0 Boxes = 0 Time = 216.2640s
+Epoch = [  3/  4] Iter = [2500/4651] Loss = 0.151 Full = 0.151 BBox = 0 Boxes = 0 Time = 216.1543s
+Epoch = [  3/  4] Iter = [2600/4651] Loss = 0.1048 Full = 0.08267 BBox = 0.07364 Boxes = 1 Time = 216.1734s
+Epoch = [  3/  4] Iter = [2700/4651] Loss = 0.1377 Full = 0.1047 BBox = 0.11 Boxes = 1 Time = 216.9421s
+Epoch = [  3/  4] Iter = [2800/4651] Loss = 0.1078 Full = 0.09241 BBox = 0.05137 Boxes = 2 Time = 220.4393s
+Epoch = [  3/  4] Iter = [2900/4651] Loss = 0.05908 Full = 0.05908 BBox = 0 Boxes = 0 Time = 216.0504s
+Epoch = [  3/  4] Iter = [3000/4651] Loss = 0.07876 Full = 0.06333 BBox = 0.05142 Boxes = 2 Time = 215.3543s
+Epoch = [  3/  4] Iter = [3100/4651] Loss = 0.1712 Full = 0.1536 BBox = 0.05892 Boxes = 1 Time = 216.7716s
+Epoch = [  3/  4] Iter = [3200/4651] Loss = 0.0614 Full = 0.05101 BBox = 0.03462 Boxes = 1 Time = 216.7054s
+Epoch = [  3/  4] Iter = [3300/4651] Loss = 0.01314 Full = 0.01314 BBox = 0 Boxes = 0 Time = 215.8860s
+Epoch = [  3/  4] Iter = [3400/4651] Loss = 0.1197 Full = 0.1197 BBox = 0 Boxes = 0 Time = 215.7499s
+Epoch = [  3/  4] Iter = [3500/4651] Loss = 0.06084 Full = 0.06084 BBox = 0 Boxes = 0 Time = 215.6389s
+Epoch = [  3/  4] Iter = [3600/4651] Loss = 0.1022 Full = 0.07524 BBox = 0.08974 Boxes = 1 Time = 216.0890s
+Epoch = [  3/  4] Iter = [3700/4651] Loss = 0.06667 Full = 0.04623 BBox = 0.06812 Boxes = 3 Time = 214.0977s
+Epoch = [  3/  4] Iter = [3800/4651] Loss = 0.1038 Full = 0.08286 BBox = 0.06972 Boxes = 1 Time = 215.1220s
+Epoch = [  3/  4] Iter = [3900/4651] Loss = 0.07065 Full = 0.07065 BBox = 0 Boxes = 0 Time = 216.1477s
+Epoch = [  3/  4] Iter = [4000/4651] Loss = 0.07603 Full = 0.07603 BBox = 0 Boxes = 0 Time = 216.0753s
+Epoch = [  3/  4] Iter = [4100/4651] Loss = 0.06768 Full = 0.06768 BBox = 0 Boxes = 0 Time = 216.0067s
+Epoch = [  3/  4] Iter = [4200/4651] Loss = 0.03045 Full = 0.03045 BBox = 0 Boxes = 0 Time = 216.6302s
+Epoch = [  3/  4] Iter = [4300/4651] Loss = 0.06836 Full = 0.06836 BBox = 0 Boxes = 0 Time = 215.2348s
+Epoch = [  3/  4] Iter = [4400/4651] Loss = 0.1199 Full = 0.0877 BBox = 0.1074 Boxes = 2 Time = 216.2578s
+Epoch = [  3/  4] Iter = [4500/4651] Loss = 0.1284 Full = 0.1057 BBox = 0.07567 Boxes = 1 Time = 216.1769s
+Epoch = [  3/  4] Iter = [4600/4651] Loss = 0.1172 Full = 0.1172 BBox = 0 Boxes = 0 Time = 216.3804s
+Epoch = [   3/   4] Train = 0.106 TrainFull = 0.09604 TrainBBox = 0.08373 ValFull = 0.09607 ValBBox = 0.068 ValObjective = 0.1165 ValSSIMFull = 0.9039 ValSSIMBBox = 0.9320 TrainAnnotatedSlices = 1824 TrainBoxes = 2593 ValAnnotatedSlices = 110 ValBoxes = 161 ValFullSlices = 791 LR = 0.0002 NextLR = 0.0002 TrainTime = 10061.5704s ValTime = 331.8355s
+  Official validation by acceleration | full={'acc4': 0.9178618839976243, 'acc8': 0.8900078603376945} bbox={'acc4': 0.9408230982094168, 'acc8': 0.9231814951808365}
