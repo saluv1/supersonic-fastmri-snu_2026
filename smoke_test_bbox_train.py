@@ -53,7 +53,7 @@ def parse_args():
         "-t",
         "--data-path",
         type=Path,
-        default=Path("/root/Data/train/"),
+        default=PROJECT_ROOT.parent / "Data" / "train",
         help="2026 training-data directory",
     )
     parser.add_argument(
