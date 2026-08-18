@@ -395,14 +395,14 @@ random.seed(n)
 
 CUDA 연산 특성상 전체 학습이 bit-identical하게 재현되지는 않습니다. 초기 weight와 데이터 순서는 동일하게 재현되지만, 일부 CUDA backward 연산의 부동소수점 누적 순서로 인해 iteration별 loss는 소수점 아래에서 조금씩 달라질 수 있습니다.
 
-4 epoch 재학습에서 iteration 0 loss는 원본 학습과 같은 `0.6352`였고, 이후 loss는 네 번째 유효숫자 부근부터 차이가 발생했습니다. 해당 로그는 `experiments/repro4_seed430.log`에 저장했습니다.
+4 epoch 재학습에서 iteration 0 loss는 원본 학습과 같은 `0.6352`였고, 이후 loss는 네 번째 유효숫자 부근부터 차이가 발생했습니다. 해당 로그는 `experiments/train_stdout_epoch4.log`에 저장했습니다.
 
 재현성 관련 파일은 다음과 같습니다.
 
 | 파일 | 내용 |
 |---|---|
 | `experiments/train_stdout.log` | 50 epoch 전체 학습 로그 |
-| `experiments/repro4_seed430.log` | seed 430 초기 4 epoch 재학습 로그 |
+| `experiments/train_stdout_epoch4.log` | seed 430 초기 4 epoch 재학습 로그 |
 | `experiments/val_loss_log.npy` | epoch별 loss 기록 |
 | `experiments/code_before_train.tar.gz` | 최종 학습 직전 코드 스냅샷 |
 | `experiments/evidence/pip_freeze.txt` | 전체 Python 패키지 목록 |
@@ -435,7 +435,7 @@ FastMRI_challenge/
 ├── recon_eval.sh
 ├── experiments/
 │   ├── train_stdout.log
-│   ├── repro4_seed430.log
+│   ├── train_stdout_epoch4.log
 │   ├── recon_eval_gpu.log
 │   ├── recon_eval_cpu.log
 │   ├── val_loss_log.npy
