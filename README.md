@@ -461,6 +461,10 @@ FastMRI_challenge/
         └── fastmri/
 
 ```
+※ 위 목록 외 reconstruct.py, leaderboard_eval.py, recon_eval_cpuonly.py,
+  smoke_test_*.py, benchmark_sens_per_coil.py, backups/ 는 개발용이며
+  채점 경로에 관여하지 않습니다 (9절 참조).
+
 ## 14. References
 
 1. Xin, B., Ye, M., Axel, L., and Metaxas, D. N. *Rethinking Deep Unrolled Model for Accelerated MRI Reconstruction*. ECCV 2024.
