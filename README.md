@@ -90,27 +90,120 @@ pip3 install -r requirements.txt
 
 ## 4. 경로 설정
 
-현재 `train.sh`와 `recon_eval.sh`에는 학습에 사용한 VESSL 서버 경로가 들어 있습니다. 다른 위치에서 실행하는 경우 아래 경로를 실제 데이터 위치에 맞게 수정해야 합니다.
+### 4-1. 전제 폴더 구조
 
-`train.sh`:
+공식 `recon_eval.py`가 CWD 기준 `'../result'`를 사용하므로, 아래 세 폴더가
+형제 관계여야 합니다.
 
-```bash
-cd /root/FastMRI_challenge
--t /root/Data/train/
--v /root/Data/val/
+```text
+<root>/
+├── FastMRI_challenge/    ← 본 저장소
+├── Data/
+│   ├── train/  {image, kspace}
+│   ├── val/    {image, kspace}
+│   └── leaderboard/  {acc4, acc8}/{image, kspace}
+└── result/
+    └── promptmr8_metric_aligned_50ep_v1/
+        └── checkpoints/best_model.pt
 ```
 
-`recon_eval.sh`:
+이 구조라면 인자 없이 그대로 실행됩니다. 셸 스크립트가 자신의 위치로 이동하므로
+**어느 디렉터리에서 호출해도 무방합니다.**
 
 ```bash
--p /root/Data/leaderboard
+bash /any/path/FastMRI_challenge/recon_eval.sh    # 채점
+bash /any/path/FastMRI_challenge/train.sh         # 학습
 ```
 
-`recon_eval.py`에서 사용하는 `../result`는 공식 코드의 상대경로입니다. 최종 체크포인트는 다음 위치에 두어야 합니다.
+### 4-2. 데이터 위치가 다른 경우
+
+코드를 수정하지 마시고 인자로 넘겨 주십시오.
+
+```bash
+bash recon_eval.sh /path/to/leaderboard
+bash train.sh      /path/to/Data          # 하위에 train/, val/ 가 있는 디렉터리
+bash train.sh      /path/to/Data  my_run  # 실험 이름도 변경
+GPU_NUM=1 bash recon_eval.sh              # GPU 번호 변경
+```
+
+### 4-3. 체크포인트 위치
 
 ```text
 ../result/promptmr8_metric_aligned_50ep_v1/checkpoints/best_model.pt
+SHA-256: 47530c3c029fb25674a9a582795fd05ffd272265f30c62c89b5471ec2a485e8c
 ```
+
+파일명은 `best_model.pt` 여야 합니다 (`utils/learning/test_part.py::load_model`).
+용량 문제로 저장소에 포함하지 않았으며, VESSL 워크스페이스의
+`/root/result/promptmr8_metric_aligned_50ep_v1/checkpoints/best_model.pt`
+및 제출 압축파일에 있습니다.
+
+### 4-4. 절대경로 제거 내역
+
+초기 준비 단계에서 학습 서버(`/root/…`) 기준 절대경로가 남아 있었으며 전부
+제거했습니다. 현재 `backups/`를 제외한 모든 `.py` / `.sh`에 절대경로가 없습니다.
+
+**셸 스크립트 4종** (`train.sh`, `recon_eval.sh`, `reconstruct.sh`,
+`leaderboard_eval.sh`)
+
+```bash
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")"; pwd)"
+cd "$SCRIPT_DIR"
+DATA_ROOT="${1:-$SCRIPT_DIR/../Data}"
+NET_NAME="${2:-promptmr8_metric_aligned_50ep_v1}"
+GPU_NUM="${GPU_NUM:-0}"
+```
+
+* `cd /root/FastMRI_challenge` → `cd "$SCRIPT_DIR"`
+* 데이터·출력 경로를 전부 `$SCRIPT_DIR` 기준 또는 인자로 전환
+* `reconstruct.sh`의 죽은 기본값 `test_Varnet` 제거
+
+**파이썬 argparse 기본값** (`train.py`, `smoke_test_bbox_train.py`,
+`smoke_test_metric_aligned_train.py`)
+
+```python
+PROJECT_ROOT = Path(__file__).resolve().parent
+default=PROJECT_ROOT.parent / "Data" / "train"     # was "/root/Data/train/"
+default=PROJECT_ROOT.parent / "Data" / "val"       # was "/root/Data/val/"
+```
+
+`train.py`의 출력 경로도 CWD 의존성을 없앴습니다.
+
+```python
+result_root = PROJECT_ROOT.parent / "result" / args.net_name   # was Path("../result")
+```
+
+셸 스크립트가 CWD를 저장소 루트로 고정하므로, 이 값은 공식 `recon_eval.py`의
+`'../result'`와 항상 동일한 경로로 해석됩니다.
+
+**학습 하이퍼파라미터는 변경하지 않았습니다.** 수정 전후 `train.sh`의 argparse
+옵션 집합이 완전히 동일함을 확인했습니다.
+
+### 4-5. `../result`를 유지한 이유
+
+`recon_eval.py`(119·128행), `recon_eval_cpuonly.py`, `reconstruct.py`의
+`'../result'`는 **의도적으로 유지**했습니다. `recon_eval.py`는 수정 금지 대상인
+공식 파일이며 이 규약을 하드코딩하고 있으므로, 나머지 코드를 여기에 맞췄습니다.
+
+또한 `recon_eval.py`는 sys.path를 `os.getcwd() + '/utils/model/'`로 설정하므로
+(22–23행) 실행 위치에 의존합니다. 공식 파일이라 수정할 수 없어, 셸 스크립트가
+자신의 위치로 이동하도록 하여 해결했습니다.
+
+### 4-6. 검증
+
+저장소 밖(`/tmp`)에서 호출해도 동일한 점수가 재현됨을 확인했습니다.
+
+```bash
+$ cd /tmp && bash /root/FastMRI_challenge/recon_eval.sh \
+    /root/Data/leaderboard promptmr8_metric_aligned_50ep_v1
+
+Leaderboard SSIM_full  : 0.9320
+Leaderboard SSIM_bbox  : 0.9301
+Leaderboard Recon Time : 793.91s (358.7 ms/slice)
+```
+
+저장소 루트에서 실행한 결과(`experiments/recon_eval_gpu.log`)와 SSIM이 완전히
+일치합니다.
 
 ## 5. 학습
 
@@ -366,66 +459,6 @@ FastMRI_challenge/
         ├── promptmr_plus.py
         ├── reentrant_wrapper.py
         └── fastmri/
-```
-# 절대경로 수정 적용 순서
-
-로컬(`~/Downloads/FastMRI_challenge`)에서 진행합니다.
-
-## 1. 셸 스크립트 3개 교체
-
-- `train.sh`      ← 이 폴더의 train.sh
-- `recon_eval.sh` ← 이 폴더의 recon_eval.sh
-- `reconstruct.sh`← 이 폴더의 reconstruct.sh
-
-```bash
-chmod +x train.sh recon_eval.sh reconstruct.sh
-rm -f leaderboard_eval.sh          # 죽은 경로(test_Varnet) 참조, 미사용
-```
-
-## 2. 파이썬 기본값 4곳 (에디터로 직접)
-
-| 파일 | 행 | 수정 |
-|---|---|---|
-| `train.py` | 80 | `default="/root/Data/train/"` → `default="../Data/train/"` |
-| `train.py` | 87 | `default="/root/Data/val/"`   → `default="../Data/val/"`   |
-| `smoke_test_bbox_train.py` | 56 | `Path("/root/Data/train/")` → `Path("../Data/train/")` |
-| `smoke_test_metric_aligned_train.py` | 48 | `Path("/root/Data/train/")` → `Path("../Data/train/")` |
-
-sed 로 일괄 처리해도 됩니다:
-
-```bash
-sed -i 's|"/root/Data/train/"|"../Data/train/"|; s|"/root/Data/val/"|"../Data/val/"|' \
-  train.py smoke_test_bbox_train.py smoke_test_metric_aligned_train.py
-```
-
-## 3. 확인
-
-```bash
-grep -rn --include="*.py" --include="*.sh" "/root/" . | grep -v "^./backups/"
-# → 아무것도 안 나와야 정상
-```
-
-`backups/` 는 참고용 스냅샷이므로 수정하지 않습니다.
-
-## 4. README 4절 교체
-
-기존 "## 4. 경로 설정" 절 전체를 `README_section4.md` 내용으로 교체.
-
-## 5. 서버에서 검증 (4 epoch 학습 종료 후)
-
-```bash
-cd /root/FastMRI_challenge && bash recon_eval.sh
-cd /tmp && bash /root/FastMRI_challenge/recon_eval.sh   # 이게 핵심
-```
-
-두 결과 모두 SSIM_full 0.9320 / SSIM_bbox 0.9301 이 나와야 합니다.
-
-## 6. 커밋
-
-```bash
-git add -A
-git commit -m "Remove hardcoded absolute paths; accept DATA_ROOT as argument"
-git push
 ```
 ```
 ```
