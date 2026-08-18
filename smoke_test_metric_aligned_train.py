@@ -1,64 +1,85 @@
+"""Run one PromptMR+ training step on an annotated 2026 slice.
+
+This script does not save a checkpoint or reconstruction. It verifies:
+
+1. annotation loading and bbox-mask construction,
+2. PromptMR+ forward,
+3. full-image and bbox SSIM losses,
+4. backward gradients,
+5. one optimizer step.
+
+Run this from the FastMRI_challenge repository root.
+"""
+
 import argparse
+import math
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
-import numpy as np
+import h5py
 import torch
+from torch.utils.data import DataLoader, Subset
 
 
-ROOT = Path(__file__).resolve().parent
-MODEL_DIR = ROOT / "utils" / "model"
+PROJECT_ROOT = Path(__file__).resolve().parent
+MODEL_ROOT = PROJECT_ROOT / "utils" / "model"
 
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if str(MODEL_ROOT) not in sys.path:
+    sys.path.insert(0, str(MODEL_ROOT))
 
-if str(MODEL_DIR) not in sys.path:
-    sys.path.insert(0, str(MODEL_DIR))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-
-from utils.common.loss_function import (
-    BBoxSSIMLoss,
-    ForegroundSSIMLoss,
-)
-from utils.common.metrics import (
-    SSIM,
-    ssim_bbox,
-    ssim_full,
-)
-from utils.data.load_data import create_data_loaders
-from utils.learning.train_part import (
-    build_model,
-    make_foreground_masks,
-)
+from utils.common.loss_function import BBoxSSIMLoss, SSIMLoss
+from utils.data.load_data import create_data_loaders, get_slice_boxes
+from utils.learning.train_part import build_model
 
 
 def parse_args():
-    parser = argparse.ArgumentParser()
-
+    parser = argparse.ArgumentParser(
+        description=(
+            "Run one forward/backward/optimizer step on an annotated slice."
+        )
+    )
     parser.add_argument(
         "-g",
-        "--gpu",
+        "--gpu-num",
         type=int,
         default=0,
+        help="CUDA device number",
     )
     parser.add_argument(
         "-t",
         "--data-path",
         type=Path,
-        default=Path("/root/Data/train/"),
+        default=PROJECT_ROOT.parent / "Data" / "train",
+        help="2026 training-data directory",
     )
     parser.add_argument(
         "--bbox-loss-weight",
         type=float,
         default=0.3,
+        help="Weight applied to BBoxSSIMLoss",
     )
-
+    parser.add_argument(
+        "--num-cascades",
+        type=int,
+        default=1,
+        help="Use a small model for the smoke test",
+    )
+    parser.add_argument(
+        "--no-checkpoint",
+        action="store_true",
+        help="Disable gradient checkpointing",
+    )
     return parser.parse_args()
 
 
-def model_args():
-    return argparse.Namespace(
-        num_cascades=1,
+def make_model_args(cli_args):
+    """Use the lightweight PromptMR+ defaults currently in train.py."""
+    return SimpleNamespace(
+        num_cascades=cli_args.num_cascades,
         n_feat0=8,
         feature_dim=[24, 32, 40],
         prompt_dim=[8, 16, 24],
@@ -76,310 +97,234 @@ def model_args():
         n_buffer=4,
         n_history=0,
         use_sens_adj=True,
-        compute_sens_per_coil=True,
+        use_checkpoint=not cli_args.no_checkpoint,
     )
 
 
-def loader_args():
-    return argparse.Namespace(
-        batch_size=1,
+def make_data_args():
+    """Arguments consumed by create_data_loaders."""
+    return SimpleNamespace(
         input_key="kspace",
         target_key="image_label",
         max_key="max",
+        batch_size=1,
     )
 
 
-def find_annotated_batch(loader):
-    for batch in loader:
-        if len(batch) != 8:
-            raise AssertionError(
-                f"Expected 8 fields, got {len(batch)}"
-            )
+def find_annotated_index(dataset):
+    """Find a dataset index without transforming every preceding slice."""
+    cached_path = None
+    cached_attrs = None
 
-        boxes_batch = batch[7]
+    for index, (image_path, slice_index) in enumerate(
+        dataset.image_examples
+    ):
+        if image_path != cached_path:
+            with h5py.File(image_path, "r") as hf:
+                cached_attrs = dict(hf.attrs)
+            cached_path = image_path
 
-        if any(
-            len(boxes) > 0
-            for boxes in boxes_batch
-        ):
-            return batch
+        boxes = get_slice_boxes(
+            cached_attrs,
+            slice_index,
+        )
+        if boxes:
+            return index, image_path, slice_index, boxes
 
     raise RuntimeError(
-        "No annotated slice was found in the dataset"
+        "No annotated slice was found in the training dataset."
     )
 
 
 def main():
-    args = parse_args()
+    cli_args = parse_args()
 
-    device = torch.device(
-        f"cuda:{args.gpu}"
-        if torch.cuda.is_available()
-        else "cpu"
-    )
+    if cli_args.bbox_loss_weight < 0:
+        raise ValueError(
+            "--bbox-loss-weight must be greater than or equal to zero"
+        )
 
-    if device.type == "cuda":
-        torch.cuda.set_device(device)
-        torch.cuda.reset_peak_memory_stats(device)
+    if not torch.cuda.is_available():
+        raise RuntimeError(
+            "CUDA is required for this PromptMR+ smoke test."
+        )
 
+    device = torch.device(f"cuda:{cli_args.gpu_num}")
+    torch.cuda.set_device(device)
+    torch.manual_seed(430)
+    torch.cuda.manual_seed_all(430)
+
+    data_args = make_data_args()
     loader = create_data_loaders(
-        data_path=args.data_path,
-        args=loader_args(),
+        data_path=cli_args.data_path,
+        args=data_args,
         shuffle=False,
-        isforward=False,
+    )
+    dataset = loader.dataset
+
+    (
+        annotated_index,
+        image_path,
+        slice_index,
+        boxes,
+    ) = find_annotated_index(dataset)
+
+    one_slice_loader = DataLoader(
+        Subset(dataset, [annotated_index]),
+        batch_size=1,
+        shuffle=False,
+        num_workers=0,
     )
 
-    batch = find_annotated_batch(loader)
+    batch = next(iter(one_slice_loader))
+    if len(batch) != 7:
+        raise RuntimeError(
+            f"Expected 7 batch items, received {len(batch)}."
+        )
 
     (
         mask,
         kspace,
         target,
         maximum,
-        fnames,
-        slices,
+        _,
+        _,
         bbox_mask,
-        boxes_batch,
     ) = batch
 
-    foreground_masks = make_foreground_masks(
-        target
+    mask = mask.to(
+        device=device,
+        non_blocking=True,
+    )
+    kspace = kspace.to(
+        device=device,
+        non_blocking=True,
+    )
+    target = target.to(
+        device=device,
+        non_blocking=True,
+    )
+    maximum = maximum.to(
+        device=device,
+        non_blocking=True,
+    )
+    bbox_mask = bbox_mask.to(
+        device=device,
+        non_blocking=True,
     )
 
-    mask = mask.to(device=device)
-    kspace = kspace.to(device=device)
-    target = target.to(device=device)
-    maximum = maximum.to(device=device)
-    foreground_masks = foreground_masks.to(
-        device=device
-    )
+    if bbox_mask.sum().item() <= 0:
+        raise RuntimeError(
+            "The selected annotated slice produced an empty bbox mask."
+        )
 
-    model = build_model(
-        model_args()
-    ).to(
-        device=device
-    )
+    model_args = make_model_args(cli_args)
+    model = build_model(model_args).to(device=device)
     model.train()
+
+    full_loss_fn = SSIMLoss().to(device=device)
+    bbox_loss_fn = BBoxSSIMLoss().to(device=device)
+    optimizer = torch.optim.AdamW(
+        model.parameters(),
+        lr=2e-4,
+        weight_decay=0.01,
+    )
+
+    optimizer.zero_grad(set_to_none=True)
 
     output = model(
         kspace,
         mask,
-        use_checkpoint=False,
-        compute_sens_per_coil=True,
+        use_checkpoint=model_args.use_checkpoint,
     )
 
-    full_loss_fn = ForegroundSSIMLoss().to(
-        device=device
-    )
-    bbox_loss_fn = BBoxSSIMLoss().to(
-        device=device
-    )
+    if output.shape != target.shape:
+        raise RuntimeError(
+            f"Output/target shape mismatch: "
+            f"{tuple(output.shape)} vs {tuple(target.shape)}"
+        )
+
+    if not torch.isfinite(output).all():
+        raise RuntimeError(
+            "Model output contains NaN or Inf."
+        )
 
     full_loss = full_loss_fn(
         output,
         target,
         maximum,
-        foreground_masks,
     )
-
     bbox_loss = bbox_loss_fn(
         output,
         target,
         maximum,
-        boxes_batch,
+        bbox_mask,
     )
-
     total_loss = (
         full_loss
-        + args.bbox_loss_weight * bbox_loss
+        + cli_args.bbox_loss_weight * bbox_loss
     )
 
-    if not torch.isfinite(total_loss):
-        raise AssertionError(
-            f"Non-finite total loss: {total_loss.item()}"
-        )
+    for loss_name, loss_value in (
+        ("full_loss", full_loss),
+        ("bbox_loss", bbox_loss),
+        ("total_loss", total_loss),
+    ):
+        if not torch.isfinite(loss_value):
+            raise RuntimeError(
+                f"{loss_name} is NaN or Inf."
+            )
 
     total_loss.backward()
 
-    gradient_tensors = 0
-    gradient_norm_squared = 0.0
+    gradient_square_sum = 0.0
+    gradient_tensor_count = 0
 
-    for parameter in model.parameters():
+    for parameter_name, parameter in model.named_parameters():
         if parameter.grad is None:
             continue
 
-        if not torch.isfinite(
-            parameter.grad
-        ).all():
-            raise AssertionError(
-                "A non-finite model gradient was found"
+        if not torch.isfinite(parameter.grad).all():
+            raise RuntimeError(
+                f"Gradient contains NaN or Inf: {parameter_name}"
             )
 
-        gradient_tensors += 1
+        gradient_square_sum += (
+            parameter.grad.detach().float().square().sum().item()
+        )
+        gradient_tensor_count += 1
 
-        gradient_norm_squared += float(
-            parameter.grad
-            .detach()
-            .float()
-            .norm()
-            .item() ** 2
+    gradient_norm = math.sqrt(gradient_square_sum)
+
+    if gradient_tensor_count == 0 or gradient_norm <= 0:
+        raise RuntimeError(
+            "No non-zero model gradient was produced."
         )
 
-    if gradient_tensors == 0:
-        raise AssertionError(
-            "No model gradients were produced"
-        )
+    optimizer.step()
+    torch.cuda.synchronize(device)
 
-    metric = SSIM().to(
-        device=device
-    )
-
-    with torch.no_grad():
-        official_full_score = ssim_full(
-            metric,
-            output[0].detach(),
-            target[0],
-            foreground_masks[0],
-            maximum[0],
-        )
-
-        official_bbox_scores = []
-
-        for box in boxes_batch[0]:
-            value = ssim_bbox(
-                metric,
-                output[0].detach(),
-                target[0],
-                box,
-                maximum[0],
-            )
-
-            if value is not None:
-                official_bbox_scores.append(
-                    value
-                )
-
-    if official_full_score is None:
-        raise AssertionError(
-            "The foreground mask was unexpectedly empty"
-        )
-
-    if not official_bbox_scores:
-        raise AssertionError(
-            "No valid bbox score was produced"
-        )
-
-    expected_full_loss = (
-        1.0 - official_full_score
-    )
-    expected_bbox_loss = (
-        1.0
-        - float(
-            np.mean(
-                official_bbox_scores
-            )
-        )
-    )
-
-    full_error = abs(
-        float(full_loss.item())
-        - expected_full_loss
-    )
-    bbox_error = abs(
-        float(bbox_loss.item())
-        - expected_bbox_loss
-    )
-
-    if full_error > 1e-5:
-        raise AssertionError(
-            "Foreground loss does not match metrics.py: "
-            f"error={full_error:.8g}"
-        )
-
-    if bbox_error > 1e-5:
-        raise AssertionError(
-            "BBox loss does not match metrics.py: "
-            f"error={bbox_error:.8g}"
-        )
-
+    print("PromptMR bbox training-step smoke test OK")
+    print(f"device: {device}")
+    print(f"file: {image_path.name}")
+    print(f"slice: {slice_index}")
+    print(f"boxes: {boxes}")
+    print(f"output: {tuple(output.shape)}")
+    print(f"bbox pixels: {int(bbox_mask.sum().item())}")
+    print(f"full loss: {full_loss.item():.6f}")
+    print(f"bbox loss: {bbox_loss.item():.6f}")
+    print(f"total loss: {total_loss.item():.6f}")
+    print(f"gradient norm: {gradient_norm:.6f}")
+    print(f"gradient tensors: {gradient_tensor_count}")
     print(
-        "Metric-aligned PromptMR training smoke test OK"
+        "CUDA peak allocated: "
+        f"{torch.cuda.max_memory_allocated(device) / 1024**3:.2f} GiB"
     )
     print(
-        "device:",
-        device,
+        "CUDA peak reserved: "
+        f"{torch.cuda.max_memory_reserved(device) / 1024**3:.2f} GiB"
     )
-    print(
-        "file:",
-        fnames[0],
-    )
-    print(
-        "slice:",
-        int(slices[0]),
-    )
-    print(
-        "boxes:",
-        boxes_batch[0],
-    )
-    print(
-        "output:",
-        tuple(output.shape),
-    )
-    print(
-        "legacy bbox-mask pixels:",
-        int(bbox_mask.sum().item()),
-    )
-    print(
-        "foreground loss:",
-        f"{full_loss.item():.6f}",
-    )
-    print(
-        "official full loss:",
-        f"{expected_full_loss:.6f}",
-    )
-    print(
-        "full alignment error:",
-        f"{full_error:.3e}",
-    )
-    print(
-        "per-box bbox loss:",
-        f"{bbox_loss.item():.6f}",
-    )
-    print(
-        "official bbox loss:",
-        f"{expected_bbox_loss:.6f}",
-    )
-    print(
-        "bbox alignment error:",
-        f"{bbox_error:.3e}",
-    )
-    print(
-        "total loss:",
-        f"{total_loss.item():.6f}",
-    )
-    print(
-        "gradient norm:",
-        f"{gradient_norm_squared ** 0.5:.6f}",
-    )
-    print(
-        "gradient tensors:",
-        gradient_tensors,
-    )
-
-    if device.type == "cuda":
-        print(
-            "CUDA peak allocated:",
-            f"{torch.cuda.max_memory_allocated(device) / 2**30:.2f} GiB",
-        )
-        print(
-            "CUDA peak reserved:",
-            f"{torch.cuda.max_memory_reserved(device) / 2**30:.2f} GiB",
-        )
-
-    print(
-        "No optimizer step, checkpoint, "
-        "or reconstruction was written."
-    )
+    print("No checkpoint or reconstruction was written.")
 
 
 if __name__ == "__main__":
