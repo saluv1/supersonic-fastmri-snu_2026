@@ -221,3 +221,4 @@ Epoch = [  3/  4] Iter = [4500/4651] Loss = 0.1284 Full = 0.1057 BBox = 0.07567 
 Epoch = [  3/  4] Iter = [4600/4651] Loss = 0.1172 Full = 0.1172 BBox = 0 Boxes = 0 Time = 216.3804s
 Epoch = [   3/   4] Train = 0.106 TrainFull = 0.09604 TrainBBox = 0.08373 ValFull = 0.09607 ValBBox = 0.068 ValObjective = 0.1165 ValSSIMFull = 0.9039 ValSSIMBBox = 0.9320 TrainAnnotatedSlices = 1824 TrainBoxes = 2593 ValAnnotatedSlices = 110 ValBoxes = 161 ValFullSlices = 791 LR = 0.0002 NextLR = 0.0002 TrainTime = 10061.5704s ValTime = 331.8355s
   Official validation by acceleration | full={'acc4': 0.9178618839976243, 'acc8': 0.8900078603376945} bbox={'acc4': 0.9408230982094168, 'acc8': 0.9231814951808365}
+
