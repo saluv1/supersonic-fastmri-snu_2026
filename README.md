@@ -459,8 +459,7 @@ FastMRI_challenge/
         ├── promptmr_plus.py
         ├── reentrant_wrapper.py
         └── fastmri/
-```
-```
+
 ```
 ## 14. References
 
