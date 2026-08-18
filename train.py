@@ -77,14 +77,14 @@ def parse():
         "-t",
         "--data-path-train",
         type=Path,
-        default="/root/Data/train/",
+        default=PROJECT_ROOT.parent / "Data" / "train",
         help="Directory of train data",
     )
     parser.add_argument(
         "-v",
         "--data-path-val",
         type=Path,
-        default="/root/Data/val/",
+        default=PROJECT_ROOT.parent / "Data" / "val",
         help="Directory of validation data",
     )
 
@@ -492,7 +492,8 @@ if __name__ == "__main__":
         )
 
     result_root = (
-        Path("../result")
+        PROJECT_ROOT.parent
+        / "result"
         / args.net_name
     )
 
